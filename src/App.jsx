@@ -1,5 +1,5 @@
-import { useState } from "react"
-import TodoInput from "./components/Todoinput"
+import { useState, useEffect } from "react"
+import Todoinput from "./components/Todoinput"
 import TodoList from "./components/TodoList"
 
 
@@ -11,24 +11,57 @@ function App() {
     'Go for a walk'
   ])
 
+  const [todoValue, setTodoValue] = useState('')
+
+  function persistData(newList) {
+    localStorage.setItem('todos', JSON.stringify({todos: newList}))
+  }
+
   //expects new todo as a new array
   function handleAddTodos(newTodo) {
-    const newTodoList = [...todos, newTodo] //spreads out old todos and adds new todo on the end
-    setTodos(newTodoList) //passes new list from above, repaints DOM
+    console.log(newTodo)
+    if (newTodo.length < 5) {
+      return "too short";
+    } else {
+      const newTodoList = [...todos, newTodo] //spreads out old todos and adds new todo on the end
+      persistData(newTodoList)
+      setTodos(newTodoList) //passes new list from above, repaints DOM
+    }
+
   }
 
   function handleDeleteTodo(index) {
-
+    const newTodoList = todos.filter((todo, todoIndex) => {
+      return todoIndex !== index
+    })
+    persistData(newTodoList)
+    setTodos(newTodoList)
   }
 
   function handleEditTodo(index) {
-    
+    const valueToBeEdited = todos[index]
+    setTodoValue(valueToBeEdited)
+    handleDeleteTodo(index)
   }
+
+  useEffect(() => {
+    if(!localStorage) {
+      return
+    }
+
+    let localTodos = localStorage.getItem('todos')
+    if (!localTodos) {
+      return
+      
+    }
+    localTodos = JSON.parse(localTodos).todos
+    setTodos(localTodos)
+  }, [])
 
   return (
     <>
-      <TodoInput handleAddTodos={handleAddTodos}/>
-      <TodoList todos={todos}/>
+      <Todoinput todoValue={todoValue} setTodoValue={setTodoValue} handleAddTodos={handleAddTodos}/>
+      <TodoList handleEditTodo={handleEditTodo} handleDeleteTodo={handleDeleteTodo} todos={todos}/>
     </>
   )
 }
