@@ -6,12 +6,11 @@ import TodoList from "./components/TodoList"
 function App() {
  
   const [todos, setTodos] = useState([
-    'Go to gym',
-    'Eat more fruits',
-    'Go for a walk'
   ])
 
   const [todoValue, setTodoValue] = useState('')
+
+  
 
   function persistData(newList) {
     localStorage.setItem('todos', JSON.stringify({todos: newList}))
@@ -19,9 +18,9 @@ function App() {
 
   //expects new todo as a new array
   function handleAddTodos(newTodo) {
-    console.log(newTodo)
-    if (newTodo.length < 5) {
-      return "too short";
+    //console.log(newTodo)
+    if (newTodo.length < 4) {
+      return
     } else {
       const newTodoList = [...todos, newTodo] //spreads out old todos and adds new todo on the end
       persistData(newTodoList)
@@ -43,6 +42,7 @@ function App() {
     setTodoValue(valueToBeEdited)
     handleDeleteTodo(index)
   }
+
 
   useEffect(() => {
     if(!localStorage) {
